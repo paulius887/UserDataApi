@@ -1,10 +1,12 @@
-﻿namespace UserDataApi.Models {
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace UserDataApi.Models {
 
     public class UserDto {
-        [UsernameIsValid]
-        public string Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
-        [EmailIsValid]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
+
+        public string? DisplayName { get; set; }
     }
 }
