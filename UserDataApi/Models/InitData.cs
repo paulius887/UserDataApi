@@ -19,7 +19,8 @@ namespace UserDataApi.Models {
                     new User {
                         Username = "willieshaker",
                         Email = "wsofficial@gmail.com",
-                        RegisterDate = DateTime.Parse("2022-06-16")
+                        RegisterDate = DateTime.Parse("2022-06-16"),
+                        DisplayName = "Willie Shaker"
                     },
                     new User {
                         Username = "botlockUZ",
@@ -29,7 +30,8 @@ namespace UserDataApi.Models {
                     new User {
                         Username = "trapper",
                         Email = "awesomeyacht@gmail.com",
-                        RegisterDate = DateTime.Parse("2023-02-22")
+                        RegisterDate = DateTime.Parse("2023-02-22"),
+                        DisplayName = "Awesome_Trapper"
                     }
                 );
                 context.SaveChanges();
