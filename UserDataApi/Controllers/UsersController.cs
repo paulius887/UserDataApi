@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserDataApi.Models;
+using UserDataApi.Validation;
 
-namespace UserDataApi.Controllers {
+namespace UserDataApi.Controllers
+{
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase {
@@ -43,22 +45,40 @@ namespace UserDataApi.Controllers {
             if (user == null) {
                 return NotFound();
             }
-            user.Username = userDto.Username;
-            user.Email = userDto.Email;
-            _context.Entry(user).State = EntityState.Modified;
+            String errorMessage;
+            errorMessage = UsernameIsValid.IsValid(userDto.Username, id, _context);
+            if (errorMessage == "") {
+                errorMessage = EmailIsValid.IsValid(userDto.Email, id, _context);
+            }
+            if (errorMessage == "") {
+                user.Username = userDto.Username;
+                user.Email = userDto.Email;
+                if (userDto.DisplayName != null) {
+                    if (userDto.DisplayName == "" || userDto.DisplayName == null) {
+                        user.DisplayName = null;
+                    }
+                    else {
+                        user.DisplayName = userDto.DisplayName;
+                    }
+                }
+                _context.Entry(user).State = EntityState.Modified;
 
-            try {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException) {
-                if (!UserExists(id)) {
-                    return NotFound();
+                try {
+                    await _context.SaveChangesAsync();
                 }
-                else {
-                    throw;
+                catch (DbUpdateConcurrencyException) {
+                    if (!UserExists(id)) {
+                        return NotFound();
+                    }
+                    else {
+                        throw;
+                    }
                 }
+                return user;
             }
-            return user;
+            else {
+                return BadRequest(errorMessage);
+            }
         }
 
         // POST: api/Users
@@ -73,10 +93,19 @@ namespace UserDataApi.Controllers {
             if (_context.Users == null) {
                 return Problem("Entity set 'UserContext.Users'  is null.");
             }
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            String errorMessage;
+            errorMessage = UsernameIsValid.IsValid(userDto.Username, _context);
+            if (errorMessage == "") {
+                errorMessage = EmailIsValid.IsValid(userDto.Email, _context);
+            }
+            if (errorMessage == "") {
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            }
+            else {
+                return BadRequest(errorMessage);
+            }
         }
 
         // DELETE: api/Users/5
