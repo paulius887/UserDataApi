@@ -18,7 +18,7 @@ docker-compose up<br />
     "id": 1,
     "registerDate": "0001-01-01T00:00:00",
     "username": "string",
-    "email": "string@gmail.com"
+    "email": "string@gmail.com",
     "displayName": "string"
 }
 ```
@@ -26,7 +26,7 @@ docker-compose up<br />
 ```json
 {
     "username": "string",
-    "email": "string@gmail.com"
+    "email": "string@gmail.com",
     "displayName": "string"
 }
 ```
