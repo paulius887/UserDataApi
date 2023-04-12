@@ -3,6 +3,7 @@ Web API with RESTful commands for accessing simple user data:
 - Username
 - Email
 - RegisterDate (date of when user was first added)
+- DisplayName (optional)
 ## How to run
 ### Step 1: Clone the git repository
 git clone --recurse ht<span>tps://</span>github.com/paulius887/UserDataApi
@@ -18,6 +19,7 @@ docker-compose up<br />
     "registerDate": "0001-01-01T00:00:00",
     "username": "string",
     "email": "string@gmail.com"
+    "displayName": "string"
 }
 ```
 ### JSON containing new/updated user information, used in POST/PUT commands
@@ -25,6 +27,7 @@ docker-compose up<br />
 {
     "username": "string",
     "email": "string@gmail.com"
+    "displayName": "string"
 }
 ```
 ## Available commands
