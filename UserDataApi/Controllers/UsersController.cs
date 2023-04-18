@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using UserDataApi.Data;
 using UserDataApi.Models;
 using UserDataApi.Validation;
 
@@ -34,11 +35,9 @@ namespace UserDataApi.Controllers
             if (user == null) {
                 return NotFound();
             }
-
             return user;
         }
         // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<ActionResult<User>> PutUser(int id, UserDto userDto) {
             var user = await _context.Users.FindAsync(id);
@@ -61,19 +60,7 @@ namespace UserDataApi.Controllers
                         user.DisplayName = userDto.DisplayName;
                     }
                 }
-                _context.Entry(user).State = EntityState.Modified;
-
-                try {
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException) {
-                    if (!UserExists(id)) {
-                        return NotFound();
-                    }
-                    else {
-                        throw;
-                    }
-                }
+                await _context.SaveChangesAsync();
                 return user;
             }
             else {
@@ -82,7 +69,6 @@ namespace UserDataApi.Controllers
         }
 
         // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<UserDto>> PostUser(UserDto userDto) {
             var user = new User {
@@ -118,10 +104,87 @@ namespace UserDataApi.Controllers
             if (user == null) {
                 return NotFound();
             }
-
+            _context.Entries.RemoveRange(_context.Entries.Where(x => x.UserId == id));
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
+            return NoContent();
+        }
+
+        // GET: api/Users/Entries
+        [HttpGet("Entries")]
+        public async Task<ActionResult<IEnumerable<Entry>>> GetEntries() {
+            if (_context.Entries == null) {
+                return NotFound();
+            }
+            return await _context.Entries.ToListAsync();
+        }
+
+        // GET: api/Users/{id}/Entries
+        [HttpGet("{id}/Entries")]
+        public async Task<ActionResult<IEnumerable<Entry>>> GetUserEntries(int id) {
+            if (_context.Entries == null) {
+                return NotFound();
+            }
+            return await _context.Entries.Where(x => x.UserId == id).ToListAsync();
+        }
+
+        // GET: api/Users/{id}/Entries/{id}
+        [HttpGet("{id}/Entries/{entryid}")]
+        public async Task<ActionResult<Entry>> GetUserEntries(int id, int entryid) {
+            if (_context.Entries == null) {
+                return NotFound();
+            }
+            var entry = await _context.Entries.FindAsync(entryid, id);
+            if (entry == null) {
+                return NotFound();
+            }
+            return entry;
+        }
+
+        // POST: api/Users/{id}/Entries
+        [HttpPost("{id}/Entries")]
+        public async Task<ActionResult<Entry>> PostEntry(int id, EntryDto entryDto) {
+            var newEntry = new Entry {
+                Id = _context.Entries.Where(x => x.UserId == id).Max(x => (int?)x.Id) + 1 ?? 1,
+                UserId = id,
+                EntryText = entryDto.EntryText,
+                LastEdited = DateTime.Now
+            };
+            _context.Entries.Add(newEntry);
+            await _context.SaveChangesAsync();
+            //return CreatedAtAction(nameof(newEntry), new { id = newEntry.Id }, newEntry);
+            return NoContent();
+        }
+
+        // PUT: api/Users/{id}/Entries/{entryid}
+        [HttpPut("{id}/Entries/{entryid}")]
+        public async Task<ActionResult<Entry>> PutEntry(int id, int entryid, EntryDto entryDto) {
+            if (await _context.Users.FindAsync(id) == null) {
+                return NotFound();
+            }
+            var entry = await _context.Entries.FindAsync(entryid, id);
+            if (entry == null) {
+                return NotFound();
+            }
+            entry.EntryText = entryDto.EntryText;
+            entry.LastEdited = DateTime.Now;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        // DELETE: api/Users/{id}/Entries/{entryid}
+        [HttpDelete("{id}/Entries/{entryid}")]
+        public async Task<IActionResult> DeleteEntry(int id, int entryid) {
+            if (await _context.Users.FindAsync(id) == null) {
+                return NotFound();
+            }
+            var entry = await _context.Entries.FindAsync(entryid, id);
+            if (entry == null) {
+                return NotFound();
+            }
+            _context.Entries.Remove(entry);
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using UserDataApi.Data;
 using UserDataApi.Models;
 
 namespace UserDataApi.Validation
