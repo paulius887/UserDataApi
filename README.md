@@ -1,11 +1,11 @@
 # UserDataApi
-Web API with RESTful commands for accessing simple user data and entries of these users:
-User data:
+Web API with RESTful commands for accessing simple user data and text entries of these users:
+### User data:
 - Username
 - Email
 - RegisterDate (date of when user was first added)
 - DisplayName (optional)
-User entries:
+### User entries:
 - EntryText (content of the entry)
 - LastEdited (date of when entry was last edited)
 ## How to run
