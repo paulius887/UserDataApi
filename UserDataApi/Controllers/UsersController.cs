@@ -153,8 +153,7 @@ namespace UserDataApi.Controllers
             };
             _context.Entries.Add(newEntry);
             await _context.SaveChangesAsync();
-            //return CreatedAtAction(nameof(newEntry), new { id = newEntry.Id }, newEntry);
-            return NoContent();
+            return CreatedAtAction(nameof(PostEntry), new { id = newEntry.Id, userId = newEntry.UserId }, newEntry);
         }
 
         // PUT: api/Users/{id}/Entries/{entryid}
@@ -170,7 +169,7 @@ namespace UserDataApi.Controllers
             entry.EntryText = entryDto.EntryText;
             entry.LastEdited = DateTime.Now;
             await _context.SaveChangesAsync();
-            return NoContent();
+            return entry;
         }
 
         // DELETE: api/Users/{id}/Entries/{entryid}
