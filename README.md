@@ -8,14 +8,14 @@ Web API with RESTful commands for accessing simple user data and text entries of
 ### User entries:
 - EntryText (content of the entry)
 - LastEdited (date of when entry was last edited)
-## How to run
+# How to run
 ### Step 1: Clone the git repository
 git clone ht<span>tps://</span>github.com/paulius887/UserDataApi
 ### Step 2: Build the project with Docker Compose
 docker-compose build<br />
 ### Step 3: Run the project with Docker Compose
 docker-compose up<br />
-## Example JSONs
+# Example JSONs
 ### JSON containing current user information, returned by GET command
 ```json
 {
@@ -49,7 +49,7 @@ docker-compose up<br />
     "entryText": "string"
 },
 ```
-## Available commands
+# Available commands
 ### GET
 ht<span>tp://localhost:5000/api/Users/ - Get information of all users <br />
 ht<span>tp://localhost:5000/api/Users/{id} - Get information of an user with specified id <br />
