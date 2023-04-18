@@ -44,6 +44,23 @@ namespace UserDataApi.Data
                         DisplayName = "Awesome_Trapper"
                     }
                 );
+                context.Entries.AddRange(
+                    new Entry {
+                        UserId = 1,
+                        Id = 1,
+                        EntryText = "My first entry!"
+                    },
+                    new Entry {
+                        UserId = 3,
+                        Id = 1,
+                        EntryText = "Out to get some groceries."
+                    },
+                    new Entry {
+                        UserId = 1,
+                        Id = 2,
+                        EntryText = "My second entry! I love this website!"
+                    }
+                );
                 context.SaveChanges();
             }
         }
