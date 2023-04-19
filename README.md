@@ -41,13 +41,13 @@ docker-compose up<br />
     "id": 1,
     "lastEdited": "0001-01-01T00:00:00",
     "entryText": "string"
-},
+}
 ```
 ### JSON containing new/updated user entry information, used in POST/PUT commands
 ```json
 {
     "entryText": "string"
-},
+}
 ```
 # Available commands
 ### GET
