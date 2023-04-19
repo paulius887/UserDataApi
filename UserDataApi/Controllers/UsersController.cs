@@ -111,15 +111,6 @@ namespace UserDataApi.Controllers
             return NoContent();
         }
 
-        // GET: api/Users/Entries
-        [HttpGet("Entries")]
-        public async Task<ActionResult<IEnumerable<Entry>>> GetEntries() {
-            if (_context.Entries == null) {
-                return NotFound();
-            }
-            return await _context.Entries.ToListAsync();
-        }
-
         // GET: api/Users/{id}/Entries
         [HttpGet("{id}/Entries")]
         public async Task<ActionResult<IEnumerable<Entry>>> GetUserEntries(int id) {
@@ -183,6 +174,17 @@ namespace UserDataApi.Controllers
                 return NotFound();
             }
             _context.Entries.Remove(entry);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+		
+		// DELETE: api/Users/{id}/Entries/
+        [HttpDelete("{id}/Entries")]
+        public async Task<IActionResult> DeleteAllEntries(int id) {
+            if (await _context.Users.FindAsync(id) == null) {
+                return NotFound();
+            }
+            _context.Entries.RemoveRange(_context.Entries.Where(x => x.UserId == id));
             await _context.SaveChangesAsync();
             return NoContent();
         }
