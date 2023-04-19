@@ -53,7 +53,7 @@ docker-compose up<br />
 ### GET
 ht<span>tp://localhost:5000/api/Users/ - Get information of all users <br />
 ht<span>tp://localhost:5000/api/Users/{id} - Get information of an user with specified id <br />
-ht<span>tp://localhost:5000/api/Users/Entries - Get information of all entries of all users <br />
+ht<span>tp://localhost:5000/api/Entries - Get information of all entries of all users <br />
 ht<span>tp://localhost:5000/api/Users/{id}/Entries - Get information of all entries of an user with specified id <br />
 ht<span>tp://localhost:5000/api/Users/{id}/Entries/{entryid} - Get information of an entry with specified entry id of an user with specified id
 ### POST
