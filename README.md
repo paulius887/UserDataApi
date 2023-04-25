@@ -61,7 +61,7 @@ ht<span>tp://localhost:5000/api/Users/ - Create a new user <br />
 ht<span>tp://localhost:5000/api/Users/{id}/Entries - Create a new entry of an user with specified id
 ### PUT
 ht<span>tp://localhost:5000/api/Users/{id} - Update information of an user with specified id <br />
-ht<span>tp://localhost:5000/api/Users/{id}/Entries/{entryid} - Update information of an entry with specified entry id of an user with specified id
+ht<span>tp://localhost:5000/api/Users/{id}/Entries/{entryid} - Update information of an entry entry with specified entry id of an user with specified id
 ### DELETE
 ht<span>tp://localhost:5000/api/Users/{id} - Remove an user with specified id (will also delete all related entries) <br />
-ht<span>tp://localhost:5000/api/Users/{id}/Entries/{entryid} - Remove an entry with specified entry id of an user with specified id
+ht<span>tp://localhost:5000/api/Users/{id}/Entries/{entryid} - Remove an entry entry with specified entry id of an user with specified id
