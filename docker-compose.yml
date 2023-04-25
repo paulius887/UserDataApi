@@ -4,3 +4,11 @@ services:
      context: .
    ports:
      - 5000:80
+ music_store:
+   build: "./lib/music_store/application"
+   ports:
+     - 5001:5000
+   links:
+     - my_mongo_db
+ my_mongo_db:
+   build: "./lib/music_store/db"
