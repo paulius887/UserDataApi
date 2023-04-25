@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UserDataApi.Data;
 using UserDataApi.Models;
 using UserDataApi.Validation;
@@ -10,10 +12,6 @@ namespace UserDataApi.Controllers
     [ApiController]
     public class UsersController : ControllerBase {
         private readonly UserContext _context;
-
-        public UsersController(UserContext context) {
-            _context = context;
-        }
 
         // GET: api/Users
         [HttpGet]

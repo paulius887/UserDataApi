@@ -1,0 +1,3 @@
+[submodule "lib/music_store"]
+	path = lib/music_store
+	url = git:https://github.com/DauJok/music_store.git
