@@ -42,7 +42,14 @@ namespace UserDataApi.Controllers
             if (user == null) {
                 return NotFound();
             }
-            UserDataValidation(userDto.Username, userDto.Email);
+            String errorMessage = UsernameIsValid.IsValid(userDto.Username, _context);
+            if (errorMessage != "") {
+                ModelState.AddModelError("Username", errorMessage);
+            }
+            errorMessage = EmailIsValid.IsValid(userDto.Email, _context);
+            if (errorMessage != "") {
+                ModelState.AddModelError("Email", errorMessage);
+            }
             if (ModelState.IsValid) {
                 user.Username = userDto.Username;
                 user.Email = userDto.Email;
@@ -73,7 +80,14 @@ namespace UserDataApi.Controllers
             if (_context.Users == null) {
                 return Problem("Entity set 'UserContext.Users' is null.");
             }
-            UserDataValidation(userDto.Username, userDto.Email);
+            String errorMessage = UsernameIsValid.IsValid(userDto.Username, _context);
+            if (errorMessage != "") {
+                ModelState.AddModelError("Username", errorMessage);
+            }
+            errorMessage = EmailIsValid.IsValid(userDto.Email, _context);
+            if (errorMessage != "") {
+                ModelState.AddModelError("Email", errorMessage);
+            }
             if (ModelState.IsValid) {
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
@@ -177,17 +191,6 @@ namespace UserDataApi.Controllers
             _context.Entries.RemoveRange(_context.Entries.Where(x => x.UserId == id));
             await _context.SaveChangesAsync();
             return NoContent();
-        }
-
-        private void UserDataValidation(string username, string email) {
-            String errorMessage = UsernameIsValid.IsValid(username, _context);
-            if (errorMessage != "") {
-                ModelState.AddModelError("Username", errorMessage);
-            }
-            errorMessage = EmailIsValid.IsValid(email, _context);
-            if (errorMessage != "") {
-                ModelState.AddModelError("Email", errorMessage);
-            }
         }
 
         private bool UserExists(int id) {
