@@ -63,7 +63,7 @@ namespace UserDataApi.Controllers
         }
         // PUT: api/Entries/{userid}/{entryid}
         [HttpPut("{userid}/{entryid}")]
-        public async Task<ActionResult<Entry>> PutEntry(int userid, int entryid, Entry entryDto) {
+        public async Task<ActionResult<Entry>> PutEntry(int userid, int entryid, EntryDto entryDto) {
             if (await _context.Users.FindAsync(userid) == null) {
                 return NotFound();
             }
