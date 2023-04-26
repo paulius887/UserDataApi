@@ -53,15 +53,18 @@ docker-compose up<br />
 ### GET
 ht<span>tp://localhost:5000/api/Users/ - Get information of all users <br />
 ht<span>tp://localhost:5000/api/Users/{id} - Get information of an user with specified id <br />
-ht<span>tp://localhost:5000/api/Entries - Get information of all entries of all users <br />
 ht<span>tp://localhost:5000/api/Users/{id}/Entries - Get information of all entries of an user with specified id <br />
 ht<span>tp://localhost:5000/api/Users/{id}/Entries/{entryid} - Get information of an entry with specified entry id of an user with specified id
+ht<span>tp://localhost:5000/api/Entries - Get information of all entries of all users <br />
+ht<span>tp://localhost:5000/api/Entries/{userid}/{entryid} - Get information of an entry with specified entry id of an user with specified id
 ### POST
 ht<span>tp://localhost:5000/api/Users/ - Create a new user <br />
 ht<span>tp://localhost:5000/api/Users/{id}/Entries - Create a new entry of an user with specified id
+ht<span>tp://localhost:5000/api/Entries - Create a new entry
 ### PUT
 ht<span>tp://localhost:5000/api/Users/{id} - Update information of an user with specified id <br />
 ht<span>tp://localhost:5000/api/Users/{id}/Entries/{entryid} - Update information of an entry entry with specified entry id of an user with specified id
+ht<span>tp://localhost:5000/api/Entries/{userid}/{entryid} - Update information of an entry entry with specified entry id of an user with specified id
 ### DELETE
 ht<span>tp://localhost:5000/api/Users/{id} - Remove an user with specified id (will also delete all related entries) <br />
 ht<span>tp://localhost:5000/api/Users/{id}/Entries/{entryid} - Remove an entry entry with specified entry id of an user with specified id
