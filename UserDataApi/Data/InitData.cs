@@ -21,14 +21,14 @@ namespace UserDataApi.Data
                     {
                         Username = "bigman",
                         Email = "sheisty@gmail.com",
-                        RegisterDate = DateTime.Parse("2021-05-15")
+                        RegisterDate = DateTime.Parse("2021-05-15"),
                     },
                     new User
                     {
                         Username = "willieshaker",
                         Email = "wsofficial@gmail.com",
                         RegisterDate = DateTime.Parse("2022-06-16"),
-                        DisplayName = "Willie Shaker"
+                        DisplayName = "Willie Shaker",
                     },
                     new User
                     {
@@ -48,17 +48,20 @@ namespace UserDataApi.Data
                     new Entry {
                         UserId = 1,
                         Id = 1,
-                        EntryText = "My first entry!"
+                        BookId = 1,
+                        EntryText = "Hey guys, I just found this Facebook tool that gives you free likes! {LINK REMOVED}"
                     },
                     new Entry {
                         UserId = 3,
                         Id = 1,
-                        EntryText = "Out to get some groceries."
+                        BookId = 1,
+                        EntryText = "Not to cherry pick (I do love picking cherries), but this book doesn't have the best landscape descriptions."
                     },
                     new Entry {
                         UserId = 1,
                         Id = 2,
-                        EntryText = "My second entry! I love this website!"
+                        BookId = 2,
+                        EntryText = "I hate this bloody book!"
                     }
                 );
                 context.SaveChanges();

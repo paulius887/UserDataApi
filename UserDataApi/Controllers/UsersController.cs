@@ -10,9 +10,13 @@ namespace UserDataApi.Controllers
     [ApiController]
     public class UsersController : ControllerBase {
         private readonly UserContext _context;
+        HttpClient client;
 
         public UsersController(UserContext context) {
             _context = context;
+            client = new HttpClient();
+            client.BaseAddress = new Uri("http://host.docker.internal:5001");
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         // GET: api/Users
@@ -37,6 +41,29 @@ namespace UserDataApi.Controllers
             }
             return user;
         }
+
+        // POST: api/Users
+        [HttpPost]
+        public async Task<ActionResult<UserDto>> PostUser(UserDto userDto) {
+            var user = new User {
+                Username = userDto.Username,
+                Email = userDto.Email,
+                RegisterDate = DateTime.Now
+            };
+            if (_context.Users == null) {
+                return Problem("Entity set 'UserContext.Users' is null.");
+            }
+            UserDataValidation(userDto.Username, userDto.Email);
+            if (ModelState.IsValid) {
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            }
+            else {
+                return BadRequest(new ValidationProblemDetails(this.ModelState));
+            }
+        }
+
         // PUT: api/Users/5
         [HttpPut("{id}")]
         public async Task<ActionResult<User>> PutUser(int id, UserDto userDto) {
@@ -58,28 +85,6 @@ namespace UserDataApi.Controllers
                 }
                 await _context.SaveChangesAsync();
                 return user;
-            }
-            else {
-                return BadRequest(new ValidationProblemDetails(this.ModelState));
-            }
-        }
-
-        // POST: api/Users
-        [HttpPost]
-        public async Task<ActionResult<UserDto>> PostUser(UserDto userDto) {
-            var user = new User {
-                Username = userDto.Username,
-                Email = userDto.Email,
-                RegisterDate = DateTime.Now
-            };
-            if (_context.Users == null) {
-                return Problem("Entity set 'UserContext.Users' is null.");
-            }
-            UserDataValidation(userDto.Username, userDto.Email);
-            if (ModelState.IsValid) {
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
             }
             else {
                 return BadRequest(new ValidationProblemDetails(this.ModelState));
@@ -128,9 +133,15 @@ namespace UserDataApi.Controllers
         // POST: api/Users/{id}/Entries
         [HttpPost("{id}/Entries")]
         public async Task<ActionResult<Entry>> PostEntry(int id, EntryDto entryDto) {
+            HttpResponseMessage response = client.GetAsync("api/books/" + entryDto.BookId).Result;
+            if (!response.IsSuccessStatusCode) {
+                ModelState.AddModelError("BookId", "Book with given id could not be found");
+                return BadRequest(new ValidationProblemDetails(this.ModelState));
+            }
             var newEntry = new Entry {
                 Id = _context.Entries.Where(x => x.UserId == id).Max(x => (int?)x.Id) + 1 ?? 1,
                 UserId = id,
+                BookId = entryDto.BookId,
                 EntryText = entryDto.EntryText,
                 LastEdited = DateTime.Now
             };
@@ -149,7 +160,13 @@ namespace UserDataApi.Controllers
             if (entry == null) {
                 return NotFound();
             }
+            HttpResponseMessage response = client.GetAsync("api/books/" + entryDto.BookId).Result;
+            if (!response.IsSuccessStatusCode) {
+                ModelState.AddModelError("BookId", "Book with given id could not be found");
+                return BadRequest(new ValidationProblemDetails(this.ModelState));
+            }
             entry.EntryText = entryDto.EntryText;
+            entry.BookId = entryDto.BookId;
             entry.LastEdited = DateTime.Now;
             await _context.SaveChangesAsync();
             return entry;

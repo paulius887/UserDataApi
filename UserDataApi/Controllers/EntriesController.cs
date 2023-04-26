@@ -14,7 +14,6 @@ namespace UserDataApi.Controllers
         public EntriesController(UserContext context) {
             _context = context;
         }
-
         // GET: api/Entries
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Entry>>> GetEntries() {
@@ -23,6 +22,7 @@ namespace UserDataApi.Controllers
             }
             return await _context.Entries.ToListAsync();
         }
+        /*
         // GET: api/Entries/5/5
         [HttpGet("{userid}/{id}")]
         public async Task<ActionResult<Entry>> GetEntry(int userid, int id) {
@@ -76,5 +76,6 @@ namespace UserDataApi.Controllers
             await _context.SaveChangesAsync();
             return entry;
         }
+        */
     }
 }
