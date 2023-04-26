@@ -63,16 +63,16 @@ namespace UserDataApi.Controllers
         }
         // PUT: api/Entries/{userid}/{entryid}
         [HttpPut("{userid}/{entryid}")]
-        public async Task<ActionResult<Entry>> PutEntry(int userid, int entryid, EntryDto entryDto) {
+        public async Task<ActionResult<Entry>> PutEntry(int userid, int entryid, Entry entry) {
             if (await _context.Users.FindAsync(userid) == null) {
                 return NotFound();
             }
-            var entry = await _context.Entries.FindAsync(entryid, userid);
-            if (entry == null) {
+            var oldEntry = await _context.Entries.FindAsync(entryid, userid);
+            if (oldEntry == null) {
                 return NotFound();
             }
-            entry.EntryText = entryDto.EntryText;
-            entry.LastEdited = DateTime.Now;
+            _context.Entries.Remove(oldEntry);
+            _context.Entries.Add(entry);
             await _context.SaveChangesAsync();
             return entry;
         }
