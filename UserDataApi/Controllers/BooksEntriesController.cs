@@ -19,22 +19,32 @@ namespace UserDataApi.Controllers {
             client.BaseAddress = new Uri("http://host.docker.internal:5001");
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
         }
-        // GET: api/BooksEntries
-        /*[HttpGet]
-        public async Task<ActionResult<IEnumerable<Book>>> GetBooksEntries() {
-            HttpResponseMessage response = client.GetAsync("api/books").Result;
+
+        // GET: api/BooksEntries/
+        [HttpGet("")]
+        public async Task<ActionResult<JObject>> GetBooksEntries() {
+            if (_context.Entries == null) {
+                return NotFound();
+            }
+            HttpResponseMessage response = client.GetAsync("api/books/").Result;
             if (response.IsSuccessStatusCode) {
                 List<Book> books = response.Content.ReadFromJsonAsync<List<Book>>().Result;
-                return Ok(books);
+                List<BookEntries> booksEntries = new List<BookEntries>();
+                for (int i = 0; i < books.Count; ++i) {
+                    BookEntries bookEntries = new BookEntries(books[i]);
+                    bookEntries.userEntries = _context.Entries.Where(x => x.BookId == books[i].id).ToList();
+                    booksEntries.Add(bookEntries);
+                }
+                return Ok(booksEntries);
             }
             else {
                 return BadRequest();
             }
-        }*/
+        }
 
         // GET: api/BooksEntries/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<JObject>> GetBooksEntries(int id) {
+        public async Task<ActionResult<JObject>> GetBookEntries(int id) {
             if (_context.Entries == null) {
                 return NotFound();
             }
