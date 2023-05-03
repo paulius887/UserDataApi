@@ -10,7 +10,7 @@ Web API with RESTful commands for accessing simple user data and text entries of
 - LastEdited (date of when entry was last edited)
 # How to run
 ### Step 1: Clone the git repository
-git clone ht<span>tps://</span>github.com/paulius887/UserDataApi
+git clone --recursive ht<span>tps://</span>github.com/paulius887/UserDataApi
 ### Step 2: Build the project with Docker Compose
 docker-compose build<br />
 ### Step 3: Run the project with Docker Compose
