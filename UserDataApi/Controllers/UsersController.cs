@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Text;
 using UserDataApi.Data;
 using UserDataApi.Models;
 using UserDataApi.Validation;
@@ -104,22 +106,48 @@ namespace UserDataApi.Controllers
             _context.Entries.RemoveRange(_context.Entries.Where(x => x.UserId == id));
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
         // GET: api/Users/{id}/Entries
         [HttpGet("{id}/Entries")]
-        public async Task<ActionResult<IEnumerable<Entry>>> GetUserEntries(int id) {
+        public async Task<ActionResult<IEnumerable<EntryBook>>> GetUserEntries(int id) {
             if (_context.Entries == null) {
                 return NotFound();
             }
-            return await _context.Entries.Where(x => x.UserId == id).ToListAsync();
+            List<Entry> entries = await _context.Entries.Where(x => x.UserId == id).ToListAsync();
+            HttpResponseMessage response = client.GetAsync("api/books/").Result;
+            if (!response.IsSuccessStatusCode) {
+                ModelState.AddModelError("Book", "Book with specified BookId could not be found");
+                return BadRequest(new ValidationProblemDetails(this.ModelState));
+            }
+            List<Book> books = response.Content.ReadFromJsonAsync<List<Book>>().Result;
+            List<EntryBook> EntriesBooks = new List<EntryBook>();
+            for (int i = 0; i < entries.Count; ++i) {
+                int bookId = entries[i].BookId;
+                Boolean changed = false;
+                for (int j = 0; j < books.Count; ++j) {
+                    if (books[i].id == bookId) {
+                        EntriesBooks.Add(new EntryBook(entries[i], books[i]));
+                        changed = true;
+                        break;
+                    }
+                }
+                if (changed == false) {
+                    ModelState.AddModelError("Entry " + i, "Book with specified BookId could not be found");
+                }
+            }
+            if (ModelState.IsValid) {
+                return EntriesBooks;
+            }
+            else {
+                return BadRequest(new ValidationProblemDetails(this.ModelState));
+            }
         }
 
         // GET: api/Users/{id}/Entries/{id}
         [HttpGet("{id}/Entries/{entryid}")]
-        public async Task<ActionResult<Entry>> GetUserEntries(int id, int entryid) {
+        public async Task<ActionResult<EntryBook>> GetUserEntries(int id, int entryid) {
             if (_context.Entries == null) {
                 return NotFound();
             }
@@ -127,27 +155,41 @@ namespace UserDataApi.Controllers
             if (entry == null) {
                 return NotFound();
             }
-            return entry;
+            try {
+                HttpResponseMessage response = client.GetAsync("api/books/" + entry.BookId).Result;
+                if (!response.IsSuccessStatusCode) {
+                    ModelState.AddModelError("Book", "Book with specified BookId could not be found");
+                    return BadRequest(new ValidationProblemDetails(this.ModelState));
+                }
+                Book book = response.Content.ReadFromJsonAsync<Book>().Result;
+                book.id = entry.BookId;
+                return Ok(new EntryBook(entry, book));
+            }
+            catch (Exception ex) {
+                return Ok(new EntryBookNoBookInfo(entry));
+            }
         }
 
         // POST: api/Users/{id}/Entries
         [HttpPost("{id}/Entries")]
-        public async Task<ActionResult<Entry>> PostEntry(int id, EntryDto entryDto) {
-            HttpResponseMessage response = client.GetAsync("api/books/" + entryDto.BookId).Result;
+        public async Task<ActionResult<EntryBook>> PostEntry(int id, EntryBookDto entryBookDto) {
+            var json = JsonConvert.SerializeObject(entryBookDto.bookDto);
+            HttpResponseMessage response = client.PostAsync("api/books/", new StringContent(json, Encoding.UTF8, "application/json")).Result;
             if (!response.IsSuccessStatusCode) {
-                ModelState.AddModelError("BookId", "Book with given id could not be found");
+                ModelState.AddModelError("Book", "Given book could not be added to the database");
                 return BadRequest(new ValidationProblemDetails(this.ModelState));
             }
+            Book book = response.Content.ReadFromJsonAsync<Book>().Result;
             var newEntry = new Entry {
                 Id = _context.Entries.Where(x => x.UserId == id).Max(x => (int?)x.Id) + 1 ?? 1,
                 UserId = id,
-                BookId = entryDto.BookId,
-                EntryText = entryDto.EntryText,
+                BookId = book.id,
+                EntryText = entryBookDto.entryDto.EntryText,
                 LastEdited = DateTime.Now
             };
             _context.Entries.Add(newEntry);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(PostEntry), new { id = newEntry.Id, userId = newEntry.UserId }, newEntry);
+            return Ok(new EntryBook(newEntry, book));
         }
 
         // PUT: api/Users/{id}/Entries/{entryid}
@@ -160,13 +202,7 @@ namespace UserDataApi.Controllers
             if (entry == null) {
                 return NotFound();
             }
-            HttpResponseMessage response = client.GetAsync("api/books/" + entryDto.BookId).Result;
-            if (!response.IsSuccessStatusCode) {
-                ModelState.AddModelError("BookId", "Book with given id could not be found");
-                return BadRequest(new ValidationProblemDetails(this.ModelState));
-            }
             entry.EntryText = entryDto.EntryText;
-            entry.BookId = entryDto.BookId;
             entry.LastEdited = DateTime.Now;
             await _context.SaveChangesAsync();
             return entry;
@@ -197,6 +233,8 @@ namespace UserDataApi.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+
 
         private void UserDataValidation(string username, string email) {
             String errorMessage = UsernameIsValid.IsValid(username, _context);
