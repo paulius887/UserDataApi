@@ -7,7 +7,8 @@ Web API with RESTful commands for accessing simple user data and text entries of
 - DisplayName (optional)
 ### User entries:
 - EntryText (content of the entry)
-- LastEdited (date of when entry was last edited)
+- Book (the book which the entry is talking about)
+- LastEdited (date of when the entry was last edited)
 # How to run
 ### Step 1: Clone the git repository
 git clone --recursive ht<span>tps://</span>github.com/paulius887/UserDataApi
@@ -36,15 +37,48 @@ docker-compose up<br />
 ```
 ### JSON containing current user entry information, returned by GET command
 ```json
+  {
+    "entry": {
+      "entryText": "string",
+      "userId": 0,
+      "id": 0,
+      "bookId": 0,
+      "lastEdited": "0001-01-01T00:00:00"
+    },
+    "book": {
+      "id": 0,
+      "title": "string",
+      "isbn": "string",
+      "createdDate": "0001-01-01T00:00:00",
+      "author": {
+        "id": 0,
+        "name": "string",
+        "surname": "string"
+      },
+      "description": "string",
+      "isAvailable": true,
+      "unavailableUntil": "0001-01-01T00:00:00"
+    }
+  }
+```
+### JSON containing new user entry information, used in POST command
+```json
 {
-    "userId": 1,
-    "bookId": 1,
-    "id": 1,
-    "lastEdited": "0001-01-01T00:00:00",
+  "entryDto": {
     "entryText": "string"
+  },
+  "bookDto": {
+    "title": "string",
+    "isbn": "string",
+    "createdDate": "2023-05-09T14:24:44.257Z",
+    "authorId": 0,
+    "description": "string",
+    "isAvailable": true,
+    "unavailableUntil": "2023-05-09T14:24:44.257Z"
+  }
 }
 ```
-### JSON containing new/updated user entry information, used in POST/PUT commands
+### JSON containing updated user entry information, used in PUT command
 ```json
 {
     "entryText": "string"
@@ -57,8 +91,6 @@ ht<span>tp://localhost:5000/api/Users/{id} - Get information of an user with spe
 ht<span>tp://localhost:5000/api/Users/{id}/Entries - Get information of all entries of an user with specified id <br />
 ht<span>tp://localhost:5000/api/Users/{id}/Entries/{entryid} - Get information of an entry with specified entry id of an user with specified id
 ht<span>tp://localhost:5000/api/Entries - Get information of all entries of all users <br />
-ht<span>tp://localhost:5000/api/BooksEntries/ - Get book info with their user entries of all books
-ht<span>tp://localhost:5000/api/BooksEntries/{id} - Get book info with their user entries of a book with specified id
 ### POST
 ht<span>tp://localhost:5000/api/Users/ - Create a new user <br />
 ht<span>tp://localhost:5000/api/Users/{id}/Entries - Create a new entry of an user with specified id <br />
