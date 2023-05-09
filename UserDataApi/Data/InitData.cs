@@ -44,24 +44,24 @@ namespace UserDataApi.Data
                         DisplayName = "Awesome_Trapper"
                     }
                 );
-                context.Entries.AddRange(
-                    new Entry {
+                context.Comments.AddRange(
+                    new Comment {
                         UserId = 1,
                         Id = 1,
                         BookId = 1,
-                        EntryText = "Hey guys, I just found this Facebook tool that gives you free likes! {LINK REMOVED}"
+                        CommentText = "Hey guys, I just found this Facebook tool that gives you free likes! {LINK REMOVED}"
                     },
-                    new Entry {
+                    new Comment {
                         UserId = 3,
                         Id = 1,
                         BookId = 1,
-                        EntryText = "Not to cherry pick (I do love picking cherries), but this book doesn't have the best landscape descriptions."
+                        CommentText = "Not to cherry pick (I do love picking cherries), but this book doesn't have the best landscape descriptions."
                     },
-                    new Entry {
+                    new Comment {
                         UserId = 1,
                         Id = 2,
                         BookId = 2,
-                        EntryText = "I hate this bloody book!"
+                        CommentText = "I hate this bloody book!"
                     }
                 );
                 context.SaveChanges();

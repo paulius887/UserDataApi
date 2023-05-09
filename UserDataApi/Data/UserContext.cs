@@ -9,9 +9,9 @@ public class UserContext : DbContext
     {
     }
     public DbSet<User> Users { get; set; } = null!;
-    public DbSet<Entry> Entries { get; set; } = null!;
+    public DbSet<Comment> Comments { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        modelBuilder.Entity<Entry>()
+        modelBuilder.Entity<Comment>()
             .HasKey(c => new { c.Id, c.UserId });
     }
 }

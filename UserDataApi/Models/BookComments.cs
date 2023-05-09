@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 
 namespace UserDataApi.Models {
-    public class BookEntries : Book {
-        public List<Entry> userEntries { get; set; }
-        public BookEntries(Book book) {
+    public class BookComments : Book {
+        public List<Comment> userComments { get; set; }
+        public BookComments(Book book) {
             this.id = book.id;
             this.title = book.title;
             this.isbn = book.isbn;
@@ -13,7 +13,7 @@ namespace UserDataApi.Models {
             this.description = book.description;
             this.isAvailable = book.isAvailable;
             this.unavailableUntil = book.unavailableUntil;
-            this.userEntries = new List<Entry>();
+            this.userComments = new List<Comment>();
         }
     }
 }

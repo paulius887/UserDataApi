@@ -103,138 +103,136 @@ namespace UserDataApi.Controllers
             if (user == null) {
                 return NotFound();
             }
-            _context.Entries.RemoveRange(_context.Entries.Where(x => x.UserId == id));
+            _context.Comments.RemoveRange(_context.Comments.Where(x => x.UserId == id));
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        // GET: api/Users/{id}/Entries
-        [HttpGet("{id}/Entries")]
-        public async Task<ActionResult<IEnumerable<EntryBook>>> GetUserEntries(int id) {
-            if (_context.Entries == null) {
+        // GET: api/Users/{id}/Comments
+        [HttpGet("{id}/Comments")]
+        public async Task<ActionResult<IEnumerable<CommentBook>>> GetUserComments(int id) {
+            if (_context.Comments == null) {
                 return NotFound();
             }
-            List<Entry> entries = await _context.Entries.Where(x => x.UserId == id).ToListAsync();
+            List<Comment> comments = await _context.Comments.Where(x => x.UserId == id).ToListAsync();
             HttpResponseMessage response = client.GetAsync("api/books/").Result;
             if (!response.IsSuccessStatusCode) {
                 ModelState.AddModelError("Book", "Book with specified BookId could not be found");
                 return BadRequest(new ValidationProblemDetails(this.ModelState));
             }
             List<Book> books = response.Content.ReadFromJsonAsync<List<Book>>().Result;
-            List<EntryBook> EntriesBooks = new List<EntryBook>();
-            for (int i = 0; i < entries.Count; ++i) {
-                int bookId = entries[i].BookId;
+            List<CommentBook> CommentsBooks = new List<CommentBook>();
+            for (int i = 0; i < comments.Count; ++i) {
+                int bookId = comments[i].BookId;
                 Boolean changed = false;
                 for (int j = 0; j < books.Count; ++j) {
-                    if (books[i].id == bookId) {
-                        EntriesBooks.Add(new EntryBook(entries[i], books[i]));
+                    if (books[j].id == bookId) {
+                        CommentsBooks.Add(new CommentBook(comments[i], books[j]));
                         changed = true;
                         break;
                     }
                 }
                 if (changed == false) {
-                    ModelState.AddModelError("Entry " + i, "Book with specified BookId could not be found");
+                    ModelState.AddModelError("Comment " + i, "Book with specified BookId could not be found (id = " + bookId + ") ");
                 }
             }
             if (ModelState.IsValid) {
-                return EntriesBooks;
+                return CommentsBooks;
             }
             else {
                 return BadRequest(new ValidationProblemDetails(this.ModelState));
             }
         }
 
-        // GET: api/Users/{id}/Entries/{id}
-        [HttpGet("{id}/Entries/{entryid}")]
-        public async Task<ActionResult<EntryBook>> GetUserEntries(int id, int entryid) {
-            if (_context.Entries == null) {
+        // GET: api/Users/{id}/Comments/{id}
+        [HttpGet("{id}/Comments/{commentid}")]
+        public async Task<ActionResult<CommentBook>> GetUserComments(int id, int commentid) {
+            if (_context.Comments == null) {
                 return NotFound();
             }
-            var entry = await _context.Entries.FindAsync(entryid, id);
-            if (entry == null) {
+            var comment = await _context.Comments.FindAsync(commentid, id);
+            if (comment == null) {
                 return NotFound();
             }
             try {
-                HttpResponseMessage response = client.GetAsync("api/books/" + entry.BookId).Result;
+                HttpResponseMessage response = client.GetAsync("api/books/" + comment.BookId).Result;
                 if (!response.IsSuccessStatusCode) {
                     ModelState.AddModelError("Book", "Book with specified BookId could not be found");
                     return BadRequest(new ValidationProblemDetails(this.ModelState));
                 }
                 Book book = response.Content.ReadFromJsonAsync<Book>().Result;
-                book.id = entry.BookId;
-                return Ok(new EntryBook(entry, book));
+                book.id = comment.BookId;
+                return Ok(new CommentBook(comment, book));
             }
             catch (Exception ex) {
-                return Ok(new EntryBookNoBookInfo(entry));
+                return Ok(new CommentBookNoBookInfo(comment));
             }
         }
 
-        // POST: api/Users/{id}/Entries
-        [HttpPost("{id}/Entries")]
-        public async Task<ActionResult<EntryBook>> PostEntry(int id, EntryBookDto entryBookDto) {
-            var json = JsonConvert.SerializeObject(entryBookDto.bookDto);
+        // POST: api/Users/{id}/Comments
+        [HttpPost("{id}/Comments")]
+        public async Task<ActionResult<CommentBook>> PostComment(int id, CommentBookDto commentBookDto) {
+            var json = JsonConvert.SerializeObject(commentBookDto.bookDto);
             HttpResponseMessage response = client.PostAsync("api/books/", new StringContent(json, Encoding.UTF8, "application/json")).Result;
             if (!response.IsSuccessStatusCode) {
                 ModelState.AddModelError("Book", "Given book could not be added to the database");
                 return BadRequest(new ValidationProblemDetails(this.ModelState));
             }
             Book book = response.Content.ReadFromJsonAsync<Book>().Result;
-            var newEntry = new Entry {
-                Id = _context.Entries.Where(x => x.UserId == id).Max(x => (int?)x.Id) + 1 ?? 1,
+            var newComment = new Comment {
+                Id = _context.Comments.Where(x => x.UserId == id).Max(x => (int?)x.Id) + 1 ?? 1,
                 UserId = id,
                 BookId = book.id,
-                EntryText = entryBookDto.entryDto.EntryText,
+                CommentText = commentBookDto.commentDto.CommentText,
                 LastEdited = DateTime.Now
             };
-            _context.Entries.Add(newEntry);
+            _context.Comments.Add(newComment);
             await _context.SaveChangesAsync();
-            return Ok(new EntryBook(newEntry, book));
+            return Ok(new CommentBook(newComment, book));
         }
 
-        // PUT: api/Users/{id}/Entries/{entryid}
-        [HttpPut("{id}/Entries/{entryid}")]
-        public async Task<ActionResult<Entry>> PutEntry(int id, int entryid, EntryDto entryDto) {
+        // PUT: api/Users/{id}/Comments/{commentid}
+        [HttpPut("{id}/Comments/{commentid}")]
+        public async Task<ActionResult<Comment>> PutComment(int id, int commentid, CommentDto commentDto) {
             if (await _context.Users.FindAsync(id) == null) {
                 return NotFound();
             }
-            var entry = await _context.Entries.FindAsync(entryid, id);
-            if (entry == null) {
+            var comment = await _context.Comments.FindAsync(commentid, id);
+            if (comment == null) {
                 return NotFound();
             }
-            entry.EntryText = entryDto.EntryText;
-            entry.LastEdited = DateTime.Now;
+            comment.CommentText = commentDto.CommentText;
+            comment.LastEdited = DateTime.Now;
             await _context.SaveChangesAsync();
-            return entry;
+            return comment;
         }
 
-        // DELETE: api/Users/{id}/Entries/{entryid}
-        [HttpDelete("{id}/Entries/{entryid}")]
-        public async Task<IActionResult> DeleteEntry(int id, int entryid) {
+        // DELETE: api/Users/{id}/Comments/{commentid}
+        [HttpDelete("{id}/Comments/{commentid}")]
+        public async Task<IActionResult> DeleteComment(int id, int commentid) {
             if (await _context.Users.FindAsync(id) == null) {
                 return NotFound();
             }
-            var entry = await _context.Entries.FindAsync(entryid, id);
-            if (entry == null) {
+            var comment = await _context.Comments.FindAsync(commentid, id);
+            if (comment == null) {
                 return NotFound();
             }
-            _context.Entries.Remove(entry);
+            _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
             return NoContent();
         }
 		
-		// DELETE: api/Users/{id}/Entries/
-        [HttpDelete("{id}/Entries")]
-        public async Task<IActionResult> DeleteAllEntries(int id) {
+		// DELETE: api/Users/{id}/Comments/
+        [HttpDelete("{id}/Comments")]
+        public async Task<IActionResult> DeleteAllComments(int id) {
             if (await _context.Users.FindAsync(id) == null) {
                 return NotFound();
             }
-            _context.Entries.RemoveRange(_context.Entries.Where(x => x.UserId == id));
+            _context.Comments.RemoveRange(_context.Comments.Where(x => x.UserId == id));
             await _context.SaveChangesAsync();
             return NoContent();
         }
-
-
 
         private void UserDataValidation(string username, string email) {
             String errorMessage = UsernameIsValid.IsValid(username, _context);
