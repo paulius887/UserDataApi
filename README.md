@@ -7,7 +7,7 @@ Web API with RESTful commands for accessing simple user data and text entries of
 - DisplayName (optional)
 ### User entries:
 - EntryText (content of the entry)
-- Book (the book which the entry is talking about)
+- Book (the book that the entry is about)
 - LastEdited (date of when the entry was last edited)
 # How to run
 ### Step 1: Clone the git repository
