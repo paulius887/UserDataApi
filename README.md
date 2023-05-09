@@ -1,5 +1,5 @@
 # UserDataApi
-Web API with RESTful commands for accessing simple user data and text entries of these users:
+Web API with RESTful commands for accessing simple user data and text entries about books of these users:
 ### User data:
 - Username
 - Email
