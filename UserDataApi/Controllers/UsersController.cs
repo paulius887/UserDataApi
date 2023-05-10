@@ -115,8 +115,18 @@ namespace UserDataApi.Controllers
             if (_context.Comments == null) {
                 return NotFound();
             }
+            HttpResponseMessage response = null;
             List<Comment> comments = await _context.Comments.Where(x => x.UserId == id).ToListAsync();
-            HttpResponseMessage response = client.GetAsync("api/books/").Result;
+            try {
+                response = client.GetAsync("api/books/").Result;
+            }
+            catch (Exception ex) {
+                List<CommentBookNoBookInfo> CommentsBooksNoInfo = new List<CommentBookNoBookInfo>();
+                for (int i = 0; i < comments.Count; ++i) {
+                    CommentsBooksNoInfo.Add(new CommentBookNoBookInfo(comments[i]));
+                }
+                return Ok(CommentsBooksNoInfo);
+            }
             if (!response.IsSuccessStatusCode) {
                 ModelState.AddModelError("Book", "Book with specified BookId could not be found");
                 return BadRequest(new ValidationProblemDetails(this.ModelState));
@@ -138,7 +148,7 @@ namespace UserDataApi.Controllers
                 }
             }
             if (ModelState.IsValid) {
-                return CommentsBooks;
+                return Ok(CommentsBooks);
             }
             else {
                 return BadRequest(new ValidationProblemDetails(this.ModelState));
@@ -174,7 +184,14 @@ namespace UserDataApi.Controllers
         [HttpPost("{id}/Comments")]
         public async Task<ActionResult<CommentBook>> PostComment(int id, CommentBookDto commentBookDto) {
             var json = JsonConvert.SerializeObject(commentBookDto.bookDto);
-            HttpResponseMessage response = client.PostAsync("api/books/", new StringContent(json, Encoding.UTF8, "application/json")).Result;
+            HttpResponseMessage response = null;
+            try {
+                response = client.PostAsync("api/books/", new StringContent(json, Encoding.UTF8, "application/json")).Result;
+            }
+            catch {
+                ModelState.AddModelError("BookService", "BookService is unavailable.");
+                return BadRequest(new ValidationProblemDetails(this.ModelState));
+            }
             if (!response.IsSuccessStatusCode) {
                 ModelState.AddModelError("Book", "Given book could not be added to the database");
                 return BadRequest(new ValidationProblemDetails(this.ModelState));
